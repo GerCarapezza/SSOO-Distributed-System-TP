@@ -1,0 +1,95 @@
+#ifndef GLOBALS_H
+#define GLOBALS_H
+
+
+#define MAX_PARAMETROS 4
+
+#include "utils/config.h"
+#include "utils/logs.h"
+// #include "configuracion.h"
+// #include <commons/collections/list.h>
+// #include <pthread.h>
+#include "semaphore.h"
+
+
+
+extern t_log* logger;
+extern configWorker* configW;
+
+extern int socketMaster;
+extern int socketStorage;
+
+extern sem_t sem_hayInterrupcion;
+extern sem_t sem_interrupcionAtendida;
+
+typedef enum {
+    CREATE,
+    TRUNCATE,
+    WRITE,
+    READ,
+    TAG,
+    COMMIT,
+    FLUSH,
+    DELETE,
+    END,
+    DESCONOCIDO
+} tipo_instruccion_t;
+
+typedef struct {
+    tipo_instruccion_t tipo;
+    char* parametro[MAX_PARAMETROS];
+} instruccion_t;
+
+typedef struct {
+    char* path_query;
+    int query_id;
+    int pc;
+    char** lineas_query;
+    int total_lineas;
+} contexto_query_t;
+
+extern contexto_query_t* contexto;
+
+typedef struct {
+    int         numeroMarco;
+    int         numeroPagina;
+    int64_t     ultimoAcceso;
+    bool        bitModificado;
+    bool        bitUso;
+    bool        bitPresencia;
+} EntradaDeTabla;
+
+
+
+typedef struct {
+    EntradaDeTabla      *entradas;              // array indexado por número de página virtual (PV)
+    int                 capacidadEntradas;      // cuantos slots están reservados (p. ej. 16, 32)
+    int                 paginasPresentes;       // cantidad de entradas con bitPresencia == true
+    bool                hayPaginasModificadas;  // true si existe al menos una página con bitModificado==true
+    char               *keyProceso;             // strdup("file:tag") — útil para logs
+} TablaDePaginas;
+
+typedef struct {
+    int nroPagina;
+    char* key;
+} PaginaXMarco;
+
+typedef struct {
+    PaginaXMarco* elementos;  
+    int capacidad;             // tamaño fijo del vector
+    int cantidad;              // opcional si necesitás saber cuántos están en uso
+} VectorPaginaXMarco;
+
+
+int calcularPaginaDesdeDireccionBase(int direccionBase);
+int calcularOffsetDesdeDireccionBase(int direccionBase);
+void inicializarCosas();
+
+// libreria interna manejar vectorpagina
+VectorPaginaXMarco* vector_pxm_create(int capacidad);
+void vector_pxm_destroy(VectorPaginaXMarco* vector);
+bool vector_pxm_addIndex(VectorPaginaXMarco* vector, int numeroPagina, char* key, int index);
+PaginaXMarco* vector_pxm_get(VectorPaginaXMarco* vector, int nroMarco);
+PaginaXMarco paginaXMarco_create(int nroPagina, char* key);
+
+#endif
