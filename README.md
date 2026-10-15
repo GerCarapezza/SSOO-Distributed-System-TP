@@ -1,7 +1,6 @@
-# tp-scaffold
+# tp-SSOO-Distributed-System
 
-Esta es una plantilla de proyecto diseñada para generar un TP de Sistemas
-Operativos de la UTN FRBA.
+Implementación de un entorno distribuido que emula los componentes fundamentales de un sistema operativo, desarrollado en lenguaje C sobre entorno Linux. El sistema articula la planificación de procesos, la gestión y asignación de memoria virtual (paginación/segmentación), el subsistema de entrada/salida y la capa de almacenamiento/archivos. Se enfoca en la comunicación entre módulos independientes mediante sockets TCP/IP, concurrencia multihilo con POSIX Threads (pthreads), serialización de paquetes y mecanismos de sincronización para prevenir condiciones de carrera y bloqueos.
 
 ## Dependencias
 
